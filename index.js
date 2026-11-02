@@ -1,5 +1,5 @@
 import express from "express";
-import { MongoClient } from "mongodb";
+import { MongoClient, ObjectId } from "mongodb";
 import cors from "cors";
 import "dotenv/config";
 
@@ -49,6 +49,16 @@ app.get("/books", async (req, res) => {
 });
 //.sort({ addedDate: -1 })
 // http://localhost:8000/books
+
+app.get("/books/:id", async (req, res) => {
+  const { id } = req.params;
+  // console.log(id);
+  const result = await booksCollection.findOne({
+    _id: new ObjectId(id),
+  });
+  res.send(result);
+});
+// http://localhost:8000/books/id
 
 app.listen(port, () => {
   console.log(`Example app listening on port http://localhost:${port}`);
