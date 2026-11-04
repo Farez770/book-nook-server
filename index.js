@@ -76,20 +76,20 @@ app.get("/my-booking/:email", async (req, res) => {
 
 //below api update the book data api
 
-// app.patch("/books/:id", async (req, res) => {
-//   const { id } = req.params;
-//   const updatedData = req.body;
-//   const result = await booksCollection.updateOne(
-//     {
-//       _id: new ObjectId(id),
-//     },
-//     {
-//       $set: updatedData,
-//     },
-//   );
-//   res.json(result);
-//   console.log(updatedData);
-// });
+app.patch("/books/:id", async (req, res) => {
+  const { id } = req.params;
+  const updatedData = req.body;
+  const result = await booksCollection.updateOne(
+    {
+      _id: new ObjectId(id),
+    },
+    {
+      $set: updatedData,
+    },
+  );
+  res.json(result);
+  console.log(updatedData);
+});
 
 //Below api is for Delete the Book
 
