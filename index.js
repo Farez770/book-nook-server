@@ -93,19 +93,19 @@ app.patch("/books/:id", async (req, res) => {
 
 //Below api is for Delete the Book
 
-// app.delete("/books/:id", async (req, res) => {
-//   const id = req.params;
-//   const result = await booksCollection.deleteOne({ _id: new ObjectId(id) });
-//   res.json(result);
-// });
+app.delete("/books/:id", async (req, res) => {
+  const id = req.params;
+  const result = await booksCollection.deleteOne({ _id: new ObjectId(id) });
+  res.json(result);
+});
 
 //--------------------------------------
 //borrows collectiopn api
-app.get("/borrows", async (req, res) => {
-  const result = await borrowsCollection.find().toArray();
-  console.log(result);
-  res.send(result);
-});
+// app.get("/borrows", async (req, res) => {
+//   const result = await borrowsCollection.find().toArray();
+//   console.log(result);
+//   res.send(result);
+// });
 
 app.listen(port, () => {
   console.log(`Example app listening on port http://localhost:${port}`);
