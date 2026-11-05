@@ -139,6 +139,7 @@ app.delete("/books/:id", verifyToken, async (req, res) => {
   res.json(result);
 });
 
+//--------------------------------------
 //Return Book api - removes the borrow record and increases totalCopies back
 app.delete("/borrows/:id", verifyToken, async (req, res) => {
   try {
@@ -180,7 +181,6 @@ app.delete("/borrows/:id", verifyToken, async (req, res) => {
   }
 });
 
-//--------------------------------------
 //borrows collectiopn api
 app.get("/borrows", verifyToken, async (req, res) => {
   try {
@@ -244,8 +244,6 @@ app.post("/borrows", verifyToken, async (req, res) => {
         .send({ message: "You have already borrowed this book!" });
     }
 
-    // self-heal: normalize totalCopies to a number if an older record stored it as a string
-    // (string values never match the { $gt: 0 } filter, which blocked every borrow)
     if (typeof book.totalCopies !== "number") {
       book.totalCopies = parseInt(book.totalCopies, 10) || 0;
       await booksCollection.updateOne(
