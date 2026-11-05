@@ -148,7 +148,6 @@ app.delete("/borrows/:id", verifyToken, async (req, res) => {
       return res.status(400).send({ message: "Invalid borrow ID!" });
     }
 
-    // make sure this borrow record belongs to the logged in user
     const borrow = await borrowsCollection.findOne({
       _id: new ObjectId(id),
       userEmail: req.user.email,
