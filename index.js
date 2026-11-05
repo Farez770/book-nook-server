@@ -2,6 +2,7 @@ import express from "express";
 import { MongoClient, ObjectId } from "mongodb";
 import cors from "cors";
 import "dotenv/config";
+import { createRemoteJWKSet, jwtVerify } from "jose";
 
 const app = express();
 const port = process.env.PORT || 8000;
@@ -25,12 +26,42 @@ const db = mongoCLient.db("booknook");
 const booksCollection = db.collection("books");
 const borrowsCollection = db.collection("borrows");
 
+const verifyToken = async (req, res, next) => {
+  const authHeader = req.headers.authorization;
+  console.log(authHeader);
+
+  if (!authHeader) {
+    return res.status(401).send({ msg: "Unauthorized" });
+  }
+
+  const token = authHeader.split(" ")[1];
+  console.log(token);
+
+  if (!token) {
+    return res.status(401).send({ msg: "Unauthorized" });
+  }
+  // console.log(token);
+
+  const JWKS = createRemoteJWKSet(
+    new URL(`${process.env.CLIENT_URL}/api/auth/jwks`),
+  );
+
+  try {
+    const { payload } = await jwtVerify(token, JWKS);
+    next();
+  } catch (error) {
+    return res.status(500).send({ msg: "Server Error!" });
+  }
+
+  // console.log(payload);
+};
+
 app.get("/", (req, res) => {
   res.send("Hello World!");
 });
 //localhost:3000/
 
-app.post("/add-book", async (req, res) => {
+app.post("/add-book", verifyToken, async (req, res) => {
   const data = req.body;
   // console.log(data);
   const bookData = {
@@ -50,7 +81,7 @@ app.get("/books", async (req, res) => {
 //.sort({ addedDate: -1 })
 // http://localhost:8000/books
 
-app.get("/books/:id", async (req, res) => {
+app.get("/books/:id", verifyToken, async (req, res) => {
   const { id } = req.params;
   // console.log(id);
   const result = await booksCollection.findOne({
@@ -101,11 +132,19 @@ app.delete("/books/:id", async (req, res) => {
 
 //--------------------------------------
 //borrows collectiopn api
-// app.get("/borrows", async (req, res) => {
-//   const result = await borrowsCollection.find().toArray();
-//   console.log(result);
-//   res.send(result);
-// });
+app.get("/borrows", async (req, res) => {
+  const result = await borrowsCollection.find().toArray();
+  console.log(result);
+  res.send(result);
+});
+
+app.post("/borrows", async (req, res) => {
+  const data = req.body;
+  const bookData = {};
+  const result = await borrowsCollection.insertOne(bookData);
+  console.log(result);
+  res.send(result);
+});
 
 app.listen(port, () => {
   console.log(`Example app listening on port http://localhost:${port}`);
